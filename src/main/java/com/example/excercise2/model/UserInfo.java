@@ -1,5 +1,7 @@
 package com.example.excercise2.model;
 
+import com.example.excercise2.entity.Editor;
+
 import java.util.List;
 
 public class UserInfo {
@@ -7,6 +9,7 @@ public class UserInfo {
     private String username;
     private List<String> roles;
     private String displayName;
+    public List<Editor> editors;
 
     public String getUserId() {
         return userId;
@@ -38,5 +41,13 @@ public class UserInfo {
 
     public String getDisplayName() {
         return displayName;
+    }
+
+    public List<Editor> getEditors() {
+        return editors;
+    }
+
+    public void setEditors(List<Editor> editors) {
+        this.editors = editors;
     }
 }
