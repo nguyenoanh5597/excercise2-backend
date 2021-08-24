@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 @RestController
+@CrossOrigin
 @RequestMapping("editor")
 public class EditorController {
     final EditorRepository editorRepository;
