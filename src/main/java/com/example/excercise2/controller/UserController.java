@@ -13,7 +13,7 @@ import java.util.Objects;
 @RestController
 @CrossOrigin
 @RequestMapping("user")
-public class UserController {
+public class UserController extends BaseController {
     final UserRepository userRepository;
 
     public UserController(UserRepository userRepository) {
@@ -24,7 +24,7 @@ public class UserController {
     public List<UserInfo> getAllUsers() {
         List<User> users = userRepository.findAll();
         List<UserInfo> allUsers = new ArrayList();
-        for(User user: users){
+        for (User user : users) {
             UserInfo userInfo = new UserInfo();
             userInfo.setUserId(user.getUserId());
             userInfo.setUsername(user.getUsername());
@@ -38,7 +38,7 @@ public class UserController {
     @GetMapping("/{userId}")
     public UserInfo getUserById(@PathVariable("userId") String userId) {
         User user = userRepository.findByUserId(userId);
-        if(Objects.isNull(user)){
+        if (Objects.isNull(user)) {
             throw new RuntimeException("User not found");
         }
         UserInfo userInfo = new UserInfo();

@@ -30,7 +30,7 @@ public class EditorServiceImpl implements EditorService {
     @Override
     public Editor updateEditor(String editorId, Editor editor) {
         Editor e = editorRepository.findEditorById(editorId);
-        if(Objects.nonNull(e)){
+        if (Objects.nonNull(e)) {
             e.setDisplayName(editor.getDisplayName());
             e.setContent(editor.getContent());
             e.setPublic(editor.getPublic());
@@ -44,7 +44,7 @@ public class EditorServiceImpl implements EditorService {
     @Override
     public String deleteEditor(String id) {
         Editor e = editorRepository.findEditorById(id);
-        if(Objects.nonNull(e)){
+        if (Objects.nonNull(e)) {
             editorRepository.delete(e);
             return "delete success";
         }
@@ -52,12 +52,12 @@ public class EditorServiceImpl implements EditorService {
     }
 
     @Override
-    public String deleteAllEditors(String userId) {
-        List<Editor> editors = editorRepository.findEditorsByUserId(userId);
-        if(editors.size() > 0){
-            editorRepository.deleteAll(editors);
-            return "delete success";
-        }
-        throw new RuntimeException("Editor not found");
+    public Editor getEditorById(String editorId) {
+        return editorRepository.findEditorById(editorId);
+    }
+
+    @Override
+    public List<Editor> getEditorsForUser(String userId) {
+        return editorRepository.findEditorsByUserId(userId);
     }
 }

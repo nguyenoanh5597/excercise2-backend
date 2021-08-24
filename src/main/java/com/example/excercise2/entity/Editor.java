@@ -4,12 +4,12 @@ import org.springframework.data.annotation.Id;
 
 public class Editor {
     @Id
-    public String id;
-    public String content;
-    public String displayName;
-    public int version;
-    public String userId;
-    public Boolean isPublic;
+    private String id;
+    private String content;
+    private String displayName;
+    private int version;
+    private String userId;
+    private Boolean isPublic;
 
     public String getId() {
         return id;
