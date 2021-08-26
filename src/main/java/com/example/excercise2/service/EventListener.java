@@ -1,8 +1,8 @@
 package com.example.excercise2.service;
 
-import com.example.excercise2.model.EditorEvent;
+import com.example.excercise2.model.Event;
 
 public interface EventListener {
 
-    void onNewEvent(EditorEvent editorEvent);
+    void onNewEvent(Event event);
 }

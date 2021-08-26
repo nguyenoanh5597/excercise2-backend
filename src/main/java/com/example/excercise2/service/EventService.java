@@ -1,12 +1,16 @@
 package com.example.excercise2.service;
 
+import com.example.excercise2.entity.Editor;
 import com.example.excercise2.model.EditorEvent;
+import com.example.excercise2.model.LiveUpdateEvent;
 
 public interface EventService {
 
-    String addListener(String editorId, EventListener listener);
+    String addListener(String userId, EventListener listener);
 
-    void removeListener(String editorId, String listenerId);
+    void removeListener(String userId, String listenerId);
 
-    void broadcastEvent(EditorEvent editorEvent);
+    void broadcastEditorUpdateEvent(Editor editor);
+
+    void broadcastLiveUpdateEvent(LiveUpdateEvent updateEvent);
 }

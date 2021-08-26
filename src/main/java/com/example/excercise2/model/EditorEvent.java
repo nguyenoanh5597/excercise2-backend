@@ -1,7 +1,8 @@
 package com.example.excercise2.model;
 
-public class EditorEvent {
+public class EditorEvent implements Event {
     private String editorId;
+    private String owner;
     private String eventId;
     private EventType eventType;
     private Object data;
@@ -36,5 +37,13 @@ public class EditorEvent {
 
     public void setEditorId(String editorId) {
         this.editorId = editorId;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 }

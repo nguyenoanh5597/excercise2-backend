@@ -50,14 +50,7 @@ public class EditorServiceImpl implements EditorService {
     }
 
     private void sendEditorContentUpdate(Editor editor) {
-        EditorEvent event = new EditorEvent();
-        event.setEventId(UUID.randomUUID().toString());
-        event.setEventType(EventType.EDITOR_CONTENT_UPDATE);
-        event.setEditorId(editor.getId());
-        Map<String, String> eventData = new HashMap<>();
-        eventData.put("content", editor.getContent());
-        event.setData(eventData);
-        eventService.broadcastEvent(event);
+        eventService.broadcastEditorUpdateEvent(editor);
     }
 
     @Override

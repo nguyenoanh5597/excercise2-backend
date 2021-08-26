@@ -1,12 +1,15 @@
 package com.example.excercise2.controller;
 
-import com.example.excercise2.model.EditorEvent;
+import com.example.excercise2.model.Event;
+import com.example.excercise2.model.LiveUpdateEvent;
+import com.example.excercise2.model.UserInfo;
 import com.example.excercise2.service.EventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,7 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @RestController
 @CrossOrigin
 @RequestMapping("/event")
-public class EventController {
+public class EventController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(EventController.class);
 
     private final EventService eventService;
@@ -24,10 +27,16 @@ public class EventController {
         this.eventService = eventService;
     }
 
-    @GetMapping("/editor/{editorId}")
-    public EditorEvent getEditorEvent(@PathVariable(name = "editorId") String editorId) {
-        final AtomicReference<EditorEvent> processed = new AtomicReference<>(null);
-        String listenerId = eventService.addListener(editorId, editorEvent -> {
+    @PostMapping("/editor/liveEvents")
+    public void submitLiveEvent(@RequestBody LiveUpdateEvent updateEvent){
+        eventService.broadcastLiveUpdateEvent(updateEvent);
+    }
+
+    @GetMapping
+    public Event getEditorEvent() {
+        UserInfo currentUser = getCurrentUser();
+        final AtomicReference<Event> processed = new AtomicReference<>(null);
+        String listenerId = eventService.addListener(currentUser.getUserId(), editorEvent -> {
             processed.set(editorEvent);
             synchronized (processed) {
                 processed.notify();
