@@ -1,16 +1,11 @@
 package com.example.excercise2.service;
 
 import com.example.excercise2.entity.Editor;
-import com.example.excercise2.model.EditorEvent;
-import com.example.excercise2.model.EventType;
 import com.example.excercise2.repositories.EditorRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 @Service
 public class EditorServiceImpl implements EditorService {
@@ -38,18 +33,29 @@ public class EditorServiceImpl implements EditorService {
     public Editor updateEditor(String editorId, Editor editor) {
         Editor e = editorRepository.findEditorById(editorId);
         if (Objects.nonNull(e)) {
+            Boolean previousPublic = e.getPublic();
+
             e.setDisplayName(editor.getDisplayName());
             e.setContent(editor.getContent());
             e.setPublic(editor.getPublic());
             e.setVersion(editor.getVersion());
             editorRepository.save(e);
-            sendEditorContentUpdate(e);
+            // TODO: only send event if something changed
+            sendEditorUpdateEvent(e);
+            if (previousPublic && !e.getPublic()) {
+                // user make an editor from public -> private
+                sendEditorVisibilityChangedEvent(editor, e.getPublic());
+            }
             return e;
         }
         throw new RuntimeException("Editor not found");
     }
 
-    private void sendEditorContentUpdate(Editor editor) {
+    private void sendEditorVisibilityChangedEvent(Editor editor, Boolean isPublic) {
+        eventService.broadcastEditorVisibilityChangedEvent(editor, isPublic);
+    }
+
+    private void sendEditorUpdateEvent(Editor editor) {
         eventService.broadcastEditorUpdateEvent(editor);
     }
 

@@ -52,14 +52,16 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void broadcastEditorUpdateEvent(Editor editor) {
-
         EditorEvent event = new EditorEvent();
         event.setEventId(UUID.randomUUID().toString());
-        event.setEventType(EventType.EDITOR_CONTENT_UPDATE);
+        event.setEventType(EventType.EDITOR_UPDATE);
         event.setEditorId(editor.getId());
         event.setOwner(editor.getUserId());
         Map<String, String> eventData = new HashMap<>();
-        eventData.put("content", editor.getContent());
+        eventData.put("displayName", editor.getDisplayName());
+        eventData.put("owner", editor.getUserId());
+        eventData.put("version", String.valueOf(editor.getVersion()));
+        eventData.put("public", editor.getPublic() ? "true" : "false");
         event.setData(eventData);
 
         if (editor.getPublic()) {
@@ -83,6 +85,18 @@ public class EventServiceImpl implements EventService {
         data.put("sourceId", updateEvent.getSourceId());
         event.setData(data);
 
+        broadcastEvent(event);
+    }
+
+    @Override
+    public void broadcastEditorVisibilityChangedEvent(Editor editor, Boolean isPublic) {
+        EditorEvent event = new EditorEvent();
+        event.setEditorId(editor.getId());
+        event.setEventType(EventType.EDITOR_VISIBILITY_CHANGED);
+        event.setEventId(UUID.randomUUID().toString());
+        Map<String, Object> data = new HashMap<>();
+        data.put("public", isPublic);
+        event.setData(data);
         broadcastEvent(event);
     }
 
