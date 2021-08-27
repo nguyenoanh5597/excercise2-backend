@@ -1,7 +1,6 @@
 package com.example.excercise2.entity;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.List;
 
