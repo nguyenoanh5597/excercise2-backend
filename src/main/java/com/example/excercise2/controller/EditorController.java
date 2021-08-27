@@ -3,6 +3,7 @@ package com.example.excercise2.controller;
 import com.example.excercise2.entity.Editor;
 import com.example.excercise2.repositories.EditorRepository;
 import com.example.excercise2.service.EditorService;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

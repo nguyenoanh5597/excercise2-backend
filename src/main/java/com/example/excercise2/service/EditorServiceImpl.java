@@ -2,6 +2,7 @@ package com.example.excercise2.service;
 
 import com.example.excercise2.entity.Editor;
 import com.example.excercise2.repositories.EditorRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

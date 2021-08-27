@@ -41,6 +41,7 @@ public class EventController extends BaseController {
             synchronized (processed) {
                 processed.notify();
             }
+            System.out.println(editorEvent);
         });
         LOGGER.info("Added EditorEvent listener {}", listenerId);
 

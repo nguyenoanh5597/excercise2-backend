@@ -64,7 +64,7 @@ public class EventServiceImpl implements EventService {
         eventData.put("public", editor.getPublic() ? "true" : "false");
         event.setData(eventData);
 
-        if (editor.getPublic()) {
+        if (editor.getPublic().equals(false)) {
             broadcastEvent(event);
         } else {
             String userId = editor.getUserId();
