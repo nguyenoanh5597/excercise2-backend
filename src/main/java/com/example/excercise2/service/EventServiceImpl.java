@@ -100,6 +100,28 @@ public class EventServiceImpl implements EventService {
         broadcastEvent(event);
     }
 
+    @Override
+    public void broadcastEditorCreatedEvent(Editor newEditor) {
+        EditorEvent event = new EditorEvent();
+        event.setEditorId(newEditor.getId());
+        event.setEventType(EventType.EDITOR_CREATED);
+        event.setEventId(UUID.randomUUID().toString());
+        event.setOwner(newEditor.getUserId());
+        Map<String, Object> data = new HashMap<>();
+        data.put("newEditor", newEditor);
+        event.setData(data);
+        broadcastEvent(event);
+    }
+
+    @Override
+    public void broadcastEditorRemovedEvent(String editorId) {
+        EditorEvent event = new EditorEvent();
+        event.setEditorId(editorId);
+        event.setEventType(EventType.EDITOR_REMOVED);
+        event.setEventId(UUID.randomUUID().toString());
+        broadcastEvent(event);
+    }
+
     private void broadcastEvent(EditorEvent event) {
         synchronized (listenersMap) {
             listenersMap.forEach((k, listeners) -> {

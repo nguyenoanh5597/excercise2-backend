@@ -15,4 +15,8 @@ public interface EventService {
     void broadcastLiveUpdateEvent(LiveUpdateEvent updateEvent);
 
     void broadcastEditorVisibilityChangedEvent(Editor editor, Boolean isPublic);
+
+    void broadcastEditorCreatedEvent(Editor newEditor);
+
+    void broadcastEditorRemovedEvent(String editorId);
 }
