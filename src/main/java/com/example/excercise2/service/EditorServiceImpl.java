@@ -26,6 +26,9 @@ public class EditorServiceImpl implements EditorService {
         newEditor.setVersion(0);
         newEditor.setContent("");
         editorRepository.save(newEditor);
+
+        sendEditorCreatedEvent(newEditor);
+
         return newEditor;
     }
 
@@ -51,19 +54,12 @@ public class EditorServiceImpl implements EditorService {
         throw new RuntimeException("Editor not found");
     }
 
-    private void sendEditorVisibilityChangedEvent(Editor editor, Boolean isPublic) {
-        eventService.broadcastEditorVisibilityChangedEvent(editor, isPublic);
-    }
-
-    private void sendEditorUpdateEvent(Editor editor) {
-        eventService.broadcastEditorUpdateEvent(editor);
-    }
-
     @Override
     public String deleteEditor(String id) {
         Editor e = editorRepository.findEditorById(id);
         if (Objects.nonNull(e)) {
             editorRepository.delete(e);
+            sendEditorRemovedEvent(id);
             return "delete success";
         }
         throw new RuntimeException("Editor not found");
@@ -77,5 +73,21 @@ public class EditorServiceImpl implements EditorService {
     @Override
     public List<Editor> getEditorsForUser(String userId) {
         return editorRepository.findEditorsByUserId(userId);
+    }
+
+    private void sendEditorCreatedEvent(Editor newEditor) {
+        eventService.broadcastEditorCreatedEvent(newEditor);
+    }
+
+    private void sendEditorRemovedEvent(String editorId) {
+        eventService.broadcastEditorRemovedEvent(editorId);
+    }
+
+    private void sendEditorVisibilityChangedEvent(Editor editor, Boolean isPublic) {
+        eventService.broadcastEditorVisibilityChangedEvent(editor, isPublic);
+    }
+
+    private void sendEditorUpdateEvent(Editor editor) {
+        eventService.broadcastEditorUpdateEvent(editor);
     }
 }
