@@ -1,19 +1,21 @@
 package com.example.excercise2.controller;
 
 import com.example.excercise2.model.Event;
+import com.example.excercise2.model.EventListener;
 import com.example.excercise2.model.LiveUpdateEvent;
-import com.example.excercise2.model.UserInfo;
 import com.example.excercise2.service.EditorEventService;
 import com.example.excercise2.service.EventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
@@ -31,29 +33,29 @@ public class EventController extends BaseController {
     }
 
     @PostMapping("/editor/liveEvents")
-    public void submitLiveEvent(@RequestBody LiveUpdateEvent updateEvent){
+    public void submitLiveEvent(@RequestBody LiveUpdateEvent updateEvent) {
         editorEventService.sendLiveUpdateEvent(updateEvent);
     }
 
-    @GetMapping
-    public Event getEditorEvent() {
-        UserInfo currentUser = getCurrentUser();
-        final AtomicReference<Event> processed = new AtomicReference<>(null);
-        String listenerId = eventService.addListener(currentUser.getUserId(), editorEvent -> {
-            processed.set(editorEvent);
-            synchronized (processed) {
-                processed.notify();
-            }
-        });
-        LOGGER.info("Added EditorEvent listener {}", listenerId);
+    @PostMapping("/listeners")
+    public EventListener createListener() {
+        return eventService.createListener(getCurrentUser().getUserId());
+    }
 
-        synchronized (processed) {
-            try {
-                processed.wait();
-            } catch (InterruptedException e) {
-                // ignore
+    @GetMapping("/listener/{listenerId}")
+    public Event getEditorEvent(@PathVariable String listenerId) {
+        Optional<EventListener> listener = eventService.getListenerById(listenerId);
+        if (listener.isPresent()) {
+            final AtomicReference<Event> event = listener.get().getEvent();
+            synchronized (event) {
+                try {
+                    event.wait();
+                } catch (InterruptedException e) {
+                    // ignore
+                }
             }
+            return event.get();
         }
-        return processed.get();
+        throw new RuntimeException("Listener not found!");
     }
 }
