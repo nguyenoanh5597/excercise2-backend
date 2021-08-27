@@ -10,13 +10,8 @@ public interface EventService {
 
     void removeListener(String userId, String listenerId);
 
-    void broadcastEditorUpdateEvent(Editor editor);
 
-    void broadcastLiveUpdateEvent(LiveUpdateEvent updateEvent);
+    void broadcastEvent(EditorEvent event);
 
-    void broadcastEditorVisibilityChangedEvent(Editor editor, Boolean isPublic);
-
-    void broadcastEditorCreatedEvent(Editor newEditor);
-
-    void broadcastEditorRemovedEvent(String editorId);
+    void sendEventToUser(EditorEvent event, String userId);
 }

@@ -10,11 +10,11 @@ import java.util.Objects;
 @Service
 public class EditorServiceImpl implements EditorService {
     private final EditorRepository editorRepository;
-    private final EventService eventService;
+    private final EditorEventService editorEventService;
 
-    public EditorServiceImpl(EditorRepository editorRepository, EventService eventService) {
+    public EditorServiceImpl(EditorRepository editorRepository, EditorEventService editorEventService) {
         this.editorRepository = editorRepository;
-        this.eventService = eventService;
+        this.editorEventService = editorEventService;
     }
 
     @Override
@@ -26,9 +26,7 @@ public class EditorServiceImpl implements EditorService {
         newEditor.setVersion(0);
         newEditor.setContent("");
         editorRepository.save(newEditor);
-
-        sendEditorCreatedEvent(newEditor);
-
+        editorEventService.sendEditorCreatedEvent(newEditor);
         return newEditor;
     }
 
@@ -44,10 +42,9 @@ public class EditorServiceImpl implements EditorService {
             e.setVersion(editor.getVersion());
             editorRepository.save(e);
             // TODO: only send event if something changed
-            sendEditorUpdateEvent(e);
+            editorEventService.sendEditorUpdateEvent(e);
             if (previousPublic && !e.getPublic()) {
-                // user make an editor from public -> private
-                sendEditorVisibilityChangedEvent(editor, e.getPublic());
+                editorEventService.sendEditorVisibilityChangedEvent(editor, e.getPublic());
             }
             return e;
         }
@@ -59,7 +56,7 @@ public class EditorServiceImpl implements EditorService {
         Editor e = editorRepository.findEditorById(id);
         if (Objects.nonNull(e)) {
             editorRepository.delete(e);
-            sendEditorRemovedEvent(id);
+            editorEventService.sendEditorRemovedEvent(id);
             return "delete success";
         }
         throw new RuntimeException("Editor not found");
@@ -73,21 +70,5 @@ public class EditorServiceImpl implements EditorService {
     @Override
     public List<Editor> getEditorsForUser(String userId) {
         return editorRepository.findEditorsByUserId(userId);
-    }
-
-    private void sendEditorCreatedEvent(Editor newEditor) {
-        eventService.broadcastEditorCreatedEvent(newEditor);
-    }
-
-    private void sendEditorRemovedEvent(String editorId) {
-        eventService.broadcastEditorRemovedEvent(editorId);
-    }
-
-    private void sendEditorVisibilityChangedEvent(Editor editor, Boolean isPublic) {
-        eventService.broadcastEditorVisibilityChangedEvent(editor, isPublic);
-    }
-
-    private void sendEditorUpdateEvent(Editor editor) {
-        eventService.broadcastEditorUpdateEvent(editor);
     }
 }

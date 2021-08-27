@@ -3,6 +3,7 @@ package com.example.excercise2.controller;
 import com.example.excercise2.model.Event;
 import com.example.excercise2.model.LiveUpdateEvent;
 import com.example.excercise2.model.UserInfo;
+import com.example.excercise2.service.EditorEventService;
 import com.example.excercise2.service.EventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,14 +23,16 @@ public class EventController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(EventController.class);
 
     private final EventService eventService;
+    private final EditorEventService editorEventService;
 
-    public EventController(EventService eventService) {
+    public EventController(EventService eventService, EditorEventService editorEventService) {
         this.eventService = eventService;
+        this.editorEventService = editorEventService;
     }
 
     @PostMapping("/editor/liveEvents")
     public void submitLiveEvent(@RequestBody LiveUpdateEvent updateEvent){
-        eventService.broadcastLiveUpdateEvent(updateEvent);
+        editorEventService.sendLiveUpdateEvent(updateEvent);
     }
 
     @GetMapping

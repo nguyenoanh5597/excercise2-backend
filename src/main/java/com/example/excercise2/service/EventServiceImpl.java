@@ -1,9 +1,6 @@
 package com.example.excercise2.service;
 
-import com.example.excercise2.entity.Editor;
 import com.example.excercise2.model.EditorEvent;
-import com.example.excercise2.model.EventType;
-import com.example.excercise2.model.LiveUpdateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -51,78 +48,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void broadcastEditorUpdateEvent(Editor editor) {
-        EditorEvent event = new EditorEvent();
-        event.setEventId(UUID.randomUUID().toString());
-        event.setEventType(EventType.EDITOR_UPDATE);
-        event.setEditorId(editor.getId());
-        event.setOwner(editor.getUserId());
-        Map<String, String> eventData = new HashMap<>();
-        eventData.put("displayName", editor.getDisplayName());
-        eventData.put("owner", editor.getUserId());
-        eventData.put("version", String.valueOf(editor.getVersion()));
-        eventData.put("public", editor.getPublic() ? "true" : "false");
-        event.setData(eventData);
-
-        if (editor.getPublic()) {
-            broadcastEvent(event);
-        } else {
-            String userId = editor.getUserId();
-            sendEventToUser(event, userId);
-        }
-    }
-
-    @Override
-    public void broadcastLiveUpdateEvent(LiveUpdateEvent updateEvent) {
-        LOGGER.info("Handle live update event {}", updateEvent);
-
-        EditorEvent event = new EditorEvent();
-        event.setEditorId(updateEvent.getEditorId());
-        event.setEventType(EventType.EDITOR_CONTENT_LIVE_UPDATE);
-        event.setEventId(UUID.randomUUID().toString());
-        Map<String, String> data = new HashMap<>();
-        data.put("content", updateEvent.getContent());
-        data.put("sourceId", updateEvent.getSourceId());
-        event.setData(data);
-
-        broadcastEvent(event);
-    }
-
-    @Override
-    public void broadcastEditorVisibilityChangedEvent(Editor editor, Boolean isPublic) {
-        EditorEvent event = new EditorEvent();
-        event.setEditorId(editor.getId());
-        event.setEventType(EventType.EDITOR_VISIBILITY_CHANGED);
-        event.setEventId(UUID.randomUUID().toString());
-        Map<String, Object> data = new HashMap<>();
-        data.put("public", isPublic);
-        event.setData(data);
-        broadcastEvent(event);
-    }
-
-    @Override
-    public void broadcastEditorCreatedEvent(Editor newEditor) {
-        EditorEvent event = new EditorEvent();
-        event.setEditorId(newEditor.getId());
-        event.setEventType(EventType.EDITOR_CREATED);
-        event.setEventId(UUID.randomUUID().toString());
-        event.setOwner(newEditor.getUserId());
-        Map<String, Object> data = new HashMap<>();
-        data.put("newEditor", newEditor);
-        event.setData(data);
-        broadcastEvent(event);
-    }
-
-    @Override
-    public void broadcastEditorRemovedEvent(String editorId) {
-        EditorEvent event = new EditorEvent();
-        event.setEditorId(editorId);
-        event.setEventType(EventType.EDITOR_REMOVED);
-        event.setEventId(UUID.randomUUID().toString());
-        broadcastEvent(event);
-    }
-
-    private void broadcastEvent(EditorEvent event) {
+    public void broadcastEvent(EditorEvent event) {
         synchronized (listenersMap) {
             listenersMap.forEach((k, listeners) -> {
                 if (CollectionUtils.isEmpty(listeners)) {
@@ -139,7 +65,8 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    private void sendEventToUser(EditorEvent event, String userId) {
+    @Override
+    public void sendEventToUser(EditorEvent event, String userId) {
         synchronized (listenersMap) {
             Map<String, EventListener> listeners = listenersMap.get(userId);
             if (CollectionUtils.isEmpty(listeners)) {
