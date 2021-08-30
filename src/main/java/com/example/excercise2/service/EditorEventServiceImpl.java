@@ -4,7 +4,6 @@ import com.example.excercise2.config.AmqpConfig;
 import com.example.excercise2.entity.Editor;
 import com.example.excercise2.model.EditorEvent;
 import com.example.excercise2.model.EventType;
-import com.example.excercise2.model.LiveUpdateEvent;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,22 +48,6 @@ public class EditorEventServiceImpl implements EditorEventService {
 //            String userId = editor.getUserId();
 //            sendEventToUser(event, userId);
 //        }
-    }
-
-    @Override
-    public void sendLiveUpdateEvent(LiveUpdateEvent updateEvent) {
-        LOGGER.info("Handle live update event {}", updateEvent);
-
-        EditorEvent event = new EditorEvent();
-        event.setEditorId(updateEvent.getEditorId());
-        event.setEventType(EventType.EDITOR_CONTENT_LIVE_UPDATE);
-        event.setEventId(UUID.randomUUID().toString());
-        Map<String, String> data = new HashMap<>();
-        data.put("content", updateEvent.getContent());
-        data.put("sourceId", updateEvent.getSourceId());
-        event.setData(data);
-
-        broadcastEvent(event);
     }
 
     @Override
