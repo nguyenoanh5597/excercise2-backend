@@ -1,25 +1,20 @@
 package com.example.excercise2.service;
 
 import com.example.excercise2.entity.Editor;
-import com.example.excercise2.model.EditorEvent;
-import com.example.excercise2.model.EventType;
 import com.example.excercise2.repositories.EditorRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 @Service
 public class EditorServiceImpl implements EditorService {
     private final EditorRepository editorRepository;
-    private final EventService eventService;
+    private final EditorEventService editorEventService;
 
-    public EditorServiceImpl(EditorRepository editorRepository, EventService eventService) {
+    public EditorServiceImpl(EditorRepository editorRepository, EditorEventService editorEventService) {
         this.editorRepository = editorRepository;
-        this.eventService = eventService;
+        this.editorEventService = editorEventService;
     }
 
     @Override
@@ -31,6 +26,7 @@ public class EditorServiceImpl implements EditorService {
         newEditor.setVersion(0);
         newEditor.setContent("");
         editorRepository.save(newEditor);
+        editorEventService.sendEditorCreatedEvent(newEditor);
         return newEditor;
     }
 
@@ -38,26 +34,21 @@ public class EditorServiceImpl implements EditorService {
     public Editor updateEditor(String editorId, Editor editor) {
         Editor e = editorRepository.findEditorById(editorId);
         if (Objects.nonNull(e)) {
+            Boolean previousPublic = e.getPublic();
+
             e.setDisplayName(editor.getDisplayName());
             e.setContent(editor.getContent());
             e.setPublic(editor.getPublic());
             e.setVersion(editor.getVersion());
             editorRepository.save(e);
-            sendEditorContentUpdate(e);
+            // TODO: only send event if something changed
+            editorEventService.sendEditorUpdateEvent(e);
+            if (previousPublic && !e.getPublic()) {
+                editorEventService.sendEditorVisibilityChangedEvent(editor, e.getPublic());
+            }
             return e;
         }
         throw new RuntimeException("Editor not found");
-    }
-
-    private void sendEditorContentUpdate(Editor editor) {
-        EditorEvent event = new EditorEvent();
-        event.setEventId(UUID.randomUUID().toString());
-        event.setEventType(EventType.EDITOR_CONTENT_UPDATE);
-        event.setEditorId(editor.getId());
-        Map<String, String> eventData = new HashMap<>();
-        eventData.put("content", editor.getContent());
-        event.setData(eventData);
-        eventService.broadcastEvent(event);
     }
 
     @Override
@@ -65,6 +56,7 @@ public class EditorServiceImpl implements EditorService {
         Editor e = editorRepository.findEditorById(id);
         if (Objects.nonNull(e)) {
             editorRepository.delete(e);
+            editorEventService.sendEditorRemovedEvent(id);
             return "delete success";
         }
         throw new RuntimeException("Editor not found");

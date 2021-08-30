@@ -3,7 +3,11 @@ package com.example.excercise2.controller;
 import com.example.excercise2.entity.User;
 import com.example.excercise2.model.UserInfo;
 import com.example.excercise2.repositories.UserRepository;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Arrays;
